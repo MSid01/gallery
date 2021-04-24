@@ -37,6 +37,58 @@ def upload():
     # return render_template("gallery.html", image_name=filename)
     return redirect(url_for('get_gallery'))
 
+@app.route("/grp_uploader")
+def grp_upload():
+    return render_template("grp_uploader.html")
+
+@app.route("/grp_uploader", methods=["POST"])
+def grp_uploader():
+    target = os.path.join(APP_ROOT, 'group_of_images/')
+    print(target)
+    if not os.path.isdir(target):
+            os.mkdir(target)
+    else:
+        print("Couldn't create upload directory: {}".format(target))
+    print(request.files.getlist("file"))
+    for upload in request.files.getlist("file"):
+        print(upload)
+        print("{} is the file name".format(upload.filename))
+        filename = upload.filename
+        destination = "/".join([target, filename])
+        print ("Accept incoming file:", filename)
+        print ("Save it to:", destination)
+        upload.save(destination)
+
+    # return send_from_directory("images", filename, as_attachment=True)
+    # return render_template("gallery.html", image_name=filename)
+    return redirect(url_for('get_gallery'))
+
+@app.route("/query_uploader")
+def query_upload():
+    return render_template("query_uploader.html")
+
+@app.route("/grp_uploader", methods=["POST"])
+def grp_uploader():
+    target = os.path.join(APP_ROOT, 'queryimg/')
+    print(target)
+    if not os.path.isdir(target):
+            os.mkdir(target)
+    else:
+        print("Couldn't create upload directory: {}".format(target))
+    print(request.files.getlist("file"))
+    for upload in request.files.getlist("file"):
+        print(upload)
+        print("{} is the file name".format(upload.filename))
+        filename = upload.filename
+        destination = "/".join([target, filename])
+        print ("Accept incoming file:", filename)
+        print ("Save it to:", destination)
+        upload.save(destination)
+
+    # return send_from_directory("images", filename, as_attachment=True)
+    # return render_template("gallery.html", image_name=filename)
+    return redirect(url_for('get_gallery'))
+
 @app.route('/upload/<filename>')
 def send_image(filename):
     return send_from_directory("images", filename)
@@ -58,5 +110,3 @@ def get_gallery():
 
 if __name__ == "__main__":
     app.run(port=4555, debug=True)
-
-
