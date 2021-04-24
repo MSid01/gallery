@@ -61,14 +61,14 @@ def grp_uploader():
 
     # return send_from_directory("images", filename, as_attachment=True)
     # return render_template("gallery.html", image_name=filename)
-    return redirect(url_for('get_gallery'))
+    return redirect(url_for('query_upload'))
 
 @app.route("/query_uploader")
 def query_upload():
     return render_template("query_uploader.html")
 
-@app.route("/grp_uploader", methods=["POST"])
-def grp_uploader():
+@app.route("/query_uploader", methods=["POST"])
+def query_uploader():
     target = os.path.join(APP_ROOT, 'queryimg/')
     print(target)
     if not os.path.isdir(target):
