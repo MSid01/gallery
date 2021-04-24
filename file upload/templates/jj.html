@@ -1,0 +1,353 @@
+<!doctype html>
+<title>Pyph</title>
+
+<!-- css -->
+<link type="text/css" rel="stylesheet" 
+    href="http://fonts.googleapis.com/css?family=Smythe" />
+<link type="text/css" rel="stylesheet" id="theme"
+    href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/themes/sunny/jquery-ui.css" />
+<link type="text/css" rel="stylesheet"
+    href="{{ url_for('static', filename='css/jquery.Jcrop.css') }}" />
+<link type="text/css" rel="stylesheet"
+    href="{{ url_for('static', filename='css/tipsy.css') }}" />
+<link type="text/css" rel="stylesheet"
+    href="{{ url_for('static', filename='css/cloud-zoom.css') }}" />
+<link type="text/css" rel="stylesheet"
+    href="{{ url_for('static', filename='css/jquery.fileupload-ui.css') }}" />
+<link type="text/css" rel="stylesheet"
+    href="{{ url_for('static', filename='css/jquery.jcarousel.css') }}" />
+<link type="text/css" rel="stylesheet/less"
+    href="{{ url_for('static', filename='css/style.less') }}" />
+
+
+<!-- header with image select/upload -->
+<h1 class="tip" title="rocks!">Pyph</h1> 
+<div id="picture-bar-wrapper">
+    <ul id="picture-bar" class="jcarousel-skin-pyph">
+    </ul>
+    <form id="picture-upload" action="/upload" method="POST"
+        enctype="multipart/form-data" class="tip" title="upload image">
+        <input type="file" name="file" multiple />
+        <button type="submit">Upload</button>
+        <img src="{{ url_for('static', filename='icons/add.png') }}"
+            alt="upload" title="Upload Images" />
+    </form>
+</div>
+<section id="upload-error">
+<h2>Upload Error :(</h2>
+<p>There was an error uploading your file. Common causes include:</p>
+<ul><li>File too large (try resizing on your computer first)</li>
+<li>Invalid file format (make sure it's one of JPG, PNG, GIF, SVG or BMP)</li>
+</ul>
+<p>Better luck next time!</p>
+</section>
+<div class="clear"></div>
+
+<!-- image display -->
+<section id="display-wrapper">
+    <div id="l-image-wrapper" class="image-wrapper">
+        <img id="l-image" class="image"
+            src="{{ url_for('static', filename='icons/picture.png') }}" />
+        <div id="l-image-h-wrapper" class="image-h-wrapper">
+            <img id="l-image-h"
+                src="{{ url_for('static', filename='icons/picture.png') }}" />
+        </div>
+    </div>
+    <div id="r-image-wrapper" class="image-wrapper">
+        <img id="r-image" class="image"
+            src="{{ url_for('static', filename='icons/picture.png') }}" />
+        <div id="r-image-h-wrapper" class="image-h-wrapper">
+            <img id="r-image-h"
+                src="{{ url_for('static', filename='icons/picture.png') }}" />
+        </div>
+    </div>
+    <div class="clear"></div>
+</section>
+<div class="clear"></div>
+
+<!-- tool select -->
+<section id="toolbox-wrapper">
+    <input id="zoom" type="checkbox" />
+    <label for="zoom" class="tool tip" title="toggle zoom" id="zoom-label">
+        <img src="{{ url_for('static', filename='icons/zoom.png') }}"
+            alt="zoom" />
+    </label>
+    <button id="l2r" class="tool tip" title="copy left image to right image">
+        <img src="{{ url_for('static', filename='icons/picture.png') }}" 
+            alt="l" />
+        <img src="{{ url_for('static', filename='icons/arrow_right.png') }}"
+                alt="->" />
+        <img src="{{ url_for('static', filename='icons/picture.png') }}"
+            alt="r" />
+    </button>
+    <button id="r2l" class="tool tip" title="copy right image to left image">
+        <img src="{{ url_for('static', filename='icons/picture.png') }}"
+            alt="l" />
+        <img src="{{ url_for('static', filename='icons/arrow_left.png') }}"
+            alt="<-" />
+        <img src="{{ url_for('static', filename='icons/picture.png') }}"
+            alt="r" />
+    </button>
+    <button id="save" class="tool tip" title="save right image to session">
+        <img src="{{ url_for('static', filename='icons/disk.png') }}"
+            alt="save" />
+    </button>
+    <button id="download" class="tool tip" title="download right image to PC">
+        <img src="{{ url_for('static', filename='icons/drive_disk.png') }}"
+            alt="download" />
+    </button>
+    <button id="crop" class="tool tip" title="crop">
+        <img src="{{ url_for('static', filename='icons/cut.png') }}"
+            alt="crop" />
+    </button>
+    <button id="resize" class="tool tip" title="resize">
+        <img src="{{ url_for('static', filename='icons/arrow_out.png') }}"
+            alt="resize" />
+    </button>
+    <button id="rotate" class="tool tip" title="rotate">
+        <img 
+src="{{ url_for('static', filename='icons/arrow_rotate_anticlockwise.png') }}"
+        alt="rotate" />
+    </button>
+    <button id="morph" class="tool tip" title="morph">
+        <img src="{{ url_for('static', filename='icons/lightning.png') }}"
+            alt="morph" />
+    </button>
+    <button id="colour-shift" class="tool tip" title="colour shift">
+        <img src="{{ url_for('static', filename='icons/color_wheel.png') }}"
+            alt="colour shift" />
+    </button>
+    <button id="lighting-shift" class="tool tip" title="lighting shift">
+        <img src="{{ url_for('static', filename='icons/contrast.png') }}"
+            alt="lighting shift" />
+    </button>
+    <button id="add-noise" class="tool tip" title="add noise">
+        <img src="{{ url_for('static', filename='icons/sound.png') }}"
+            alt="add noise" />
+    </button>
+    <button id="filter" class="tool tip" title="filter">
+        <img src="{{ url_for('static', filename='icons/layers.png') }}"
+            alt="filter" />
+    </button>
+    <button id="enhance" class="tool tip" title="enhance">
+        <img src="{{ url_for('static', filename='icons/rosette.png') }}"
+            alt="enhance" />
+    </button>
+</section>
+
+<!-- toolpanes -->
+<section id="crop-pane" class="toolpane">
+    <img src="{{ url_for('static', filename='icons/cross.png') }}"
+        alt="close" class="toolpane-close tip" title="Close" />
+    <h2>Crop</h2>
+    <p>Click and drag on the left hand image to select your crop area!</p>
+    <label for="crop-x">x: </label><input id="crop-x" size="4" />
+    <label for="crop-y">y: </label><input id="crop-y" size="4" />
+    <label for="crop-x2">x2: </label><input id="crop-x2" size="4" />
+    <label for="crop-y2">y2: </label><input id="crop-y2" size="4" />
+    <button id="crop-go">Crop!</button>
+</section>
+
+<section id="resize-pane" class="toolpane">
+    <img src="{{ url_for('static', filename='icons/cross.png') }}"
+        alt="close" class="toolpane-close tip" title="Close" />
+    <h2>Resize</h2>
+    <p>Enter either a new image size or a scaling factor, then click
+    Resize</p>
+    <label for="resize-w">new w: </label><input id="resize-w" size="4" /> and
+    <label for="resize-h">new h: </label><input id="resize-h" size="4" />
+    <br />or<br />
+    <label for="resize-sf">scale factor: </label>
+    <input id="resize-sf" size="4" />
+    <br />
+    interpolation algorithm:
+    <div id="resize-kind">
+        <input type="radio" id="resize-kind-bilinear" name="resize-kind" 
+            value="bilinear" checked="checked" />
+        <label for="resize-kind-bilinear">bilinear</label>
+        <input type="radio" id="resize-kind-bicubic" name="resize-kind"
+            value="bicubic" />
+        <label for="resize-kind-bicubic">bicubic</label>
+    </div>
+    <br />
+    <button id="resize-go">Resize!</button>
+</section>
+
+<!-- processing message -->
+<section id="processing">
+<p><img src="/static/icons/loading.gif" alt="loading..." /></p>
+<p>Please wait, processing...</p>
+<p><a href="#" title="Cancel Request">Cancel</a></p>
+</section>
+
+<!-- footer -->
+<footer>
+
+<p>
+    Written by
+    <a href="http://adamgreig.com" title="Adam Greig's homepage">
+        Adam Greig
+    </a>, released under the
+    <a href="http://www.opensource.org/licenses/bsd-license"
+        title="BSD License">
+        simplified BSD license
+    </a>. Source on
+    <a href="https://github.com/adamgreig/Pyph" title="source on github">
+        GitHub
+    </a>. <a href="#" id="show-keyboard-shortcuts">Keyboard Shortcuts</a>.
+    <a href="#" id="show-help">Help?</a>
+</p>
+
+<section id="help">
+<h2>Uploading Pictures</h2>
+<p>Click the <img src="{{ url_for('static', filename='icons/add.png') }}"
+alt="upload" /> button in the top right corner to upload a new image. Uploaded
+images are shown in the carousel where you can download or delete them by
+clicking the icons that appear when you mouseover the picture.</p>
+<h2>Using Pictures</h2>
+<p>You can either click on a picture in the carousel, drag a thumbnail from the
+carousel onto a display pane or drag one of the display pane images into the
+other to load an image. The copy left to right and copy right to left buttons
+will copy the pictures in the display pane to each other. The download button
+(<img src="{{ url_for('static', filename='icons/drive_disk.png') }}"
+alt="download" />) saves the right hand image to your computer, while the save
+button (<img src="{{ url_for('static', filename='icons/disk.png') }}"
+alt="save" />) saves the right hand image to the session for later use.</p>
+<h2>Zoom</h2>
+<p>Clicking the zoom icon (<img
+src="{{ url_for('static', filename='icons/zoom.png') }}" alt="zoom" />) toggles
+image zoom. When enabled, mousing over the display pane images will reveal a
+zoomed in image that moves with the mouse. Both left and right image panes 
+are zoomable.</p>
+<h2>Image Editing Tools</h2>
+<p>The rest of the tools are used to edit the image. They apply to the left
+hand image and the results are shown on the right hand side. Click a tool to
+activate it, then use the new box that opens and/or interact with the image as
+appropriate to edit.</p>
+</section>
+<section id="keyboard-shortcuts">
+<h2>Keyboard Shortcuts</h2>
+<strong>z</strong>: zoom<br />
+<strong>l</strong>: copy left image to right<br />
+<strong>h</strong>: copy right image to left<br />
+<strong>s</strong>: save right image to session<br />
+<strong>d</strong>: download right image<br />
+<strong>c</strong>: crop<br />
+<strong>r</strong>: resize<br />
+<strong>o</strong>: rotate<br />
+<strong>m</strong>: morph<br />
+<strong>C</strong>: colour shift<br />
+<strong>L</strong>: lighting shift<br />
+<strong>n</strong>: add noise<br />
+<strong>f</strong>: filter<br />
+<strong>e</strong>: enhance<br />
+<strong>escape</strong>: close tool pane<br />
+</section>
+
+<p>
+    Website uses 
+    <a href="http://jquery.com" title="jQuery homepage">
+        jQuery
+    </a>,
+    <a href="http://jqueryui.com" title="jQuery UI homepage">
+        jQuery UI
+    </a>,
+    <a href="http://deepliquid.com/content/Jcrop.html"
+        title="jCrop plugin">
+        jCrop
+    </a>,
+    <a href="http://aquantum-demo.appspot.com/file-upload"
+        title="jQuery-File-Upload plugin homepage">
+        jQuery File Upload
+    </a>,
+    <a href="http://onehackoranother.com/projects/jquery/tipsy/"
+        title="tipsy jquery plugin">
+        tipsy
+    </a>,
+    <a href="http://sorgalla.com/projects/jcarousel/" title="jCarousel">
+        jCarousel
+    </a>, 
+    <a href="http://www.professorcloud.com/mainsite/cloud-zoom.htm"
+        title="cloud zoom javascript">
+        cloud zoom
+    </a>,
+    <a href="http://www.google.com/webfonts/family?family=Smythe&amp;subset=latin">
+        Smythe font
+    </a>,
+    <a href="http://lesscss.org/" title="LessCSS">
+        LessCSS
+    </a> and
+    <a href="http://www.famfamfam.com/lab/icons/silk/"
+        title="Silk icons on FamFamFam">
+    Silk icons
+    </a>. Designed for
+    <a href="http://www.google.com/chrome" title="Google Chrome">
+        Google Chrome
+    </a>, may work elsewhere.<br />
+    Backend uses
+    <a href="http://flask.pocoo.org" title="Flask Python microframework">
+        Flask
+    </a> with
+    <a href="http://packages.python.org/Flask-Uploads/"
+        title="Flask-Uploads extension">
+        Flask-Uploads
+    </a>,
+    <a href="http://www.pythonware.com/products/pil/" title="PIL">
+        PIL
+    </a>,
+    <a href="http://numpy.scipy.org/" title="numpy">
+        NumPy
+    </a> and
+    <a href="http://matplotlib.sourceforge.net/" title="matplotlib">
+        matplotlib
+    </a> on
+    <a href="http://python.org" title="Python homepage">
+        Python
+    </a>.<br />
+    Stock images from <a href="http://flickr.com/photos/randomskk"
+        title="randomskk's photostream on flickr">my flickr</a>.
+</p>
+<p>
+    <a href="/reset" title="reset everything" id="reset-link">
+        Click to reset your session
+    </a>. All uploaded files will be removed.
+</p>
+</footer>
+
+<!-- scripts -->
+<script
+    src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js">
+</script>
+<script
+    src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js">
+</script>
+<script
+    src="{{ url_for('static', filename='js/jquery.Jcrop.min.js') }}">
+</script>
+<script
+    src="{{ url_for('static', filename='js/jquery.fileupload.min.js') }}">
+</script>
+<script
+    src="{{ url_for('static', filename='js/jquery.fileupload-ui.min.js') }}">
+</script>
+<script
+    src="{{ url_for('static', filename='js/jquery.tipsy.min.js') }}">
+</script>
+<script
+    src="{{ url_for('static', filename='js/less-1.0.41.min.js') }}">
+</script>
+<script
+    src="{{ url_for('static', filename='js/cloud-zoom.1.0.2.min.js') }}">
+</script>
+<script
+    src="{{ url_for('static', filename='js/jquery.jcarousel.min.js') }}">
+</script>
+<script
+    src="{{ url_for('static', filename='js/jquery.hotkeys.min.js') }}">
+</script>
+<script
+    src="{{ url_for('static', filename='js/jquery.blockUI.min.js') }}">
+</script>
+<script
+    src="{{ url_for('static', filename='js/pyph.js') }}">
+</script>
