@@ -7,6 +7,10 @@
     <title>Document</title>
 </head>
 <body>
-    <a href=download ><button class=grey style="height:55px;width:150px;background-color:#8752cc">Download file</button></a>
+    <form action="{{url_for('download', pdfile=file_name)}}" >
+        <input type=hidden value="DOWNLOAD"name="_method" />
+        <input type=submit value="download" />
+    </form>
+    <a href=/ ><button class=grey style="height:40px;width:150px;background-color:#ffffff">Back to Gallery</button></a>
 </body>
 </html>

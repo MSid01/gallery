@@ -3,12 +3,13 @@ import os,shutil
 
 from flask import Flask, request, render_template, send_from_directory,redirect, url_for,abort
 import cv2
-
+from fpdf import FPDF
+import glob
 __author__ = 'Siddhesh'
 
 app = Flask(__name__)
 
-
+pdf = FPDF()
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -43,18 +44,77 @@ def upload():
 def downloader():
     return render_template("download.html")
 
-app.config["CLIENT_IMAGES"]=APP_ROOT + '\\extracted_photos'
-@app.route('/download/<path:path>',methods = ['GET','POST'])
-def download(path):
+app.config["CLIENT_PDF"]=APP_ROOT +"/pdfmade/"
+@app.route('/download/<pdfile>')
+def download(pdfile):
+    print("asasassasasassasasas")
     """Download a file."""
     try:
-        return send_from_directory(app.config["CLIENT_IMAGES"], path, as_attachment=True)
+        return send_from_directory(app.config["CLIENT_PDF"], filename=pdfile, as_attachment=True)
+
     except FileNotFoundError:
         abort(404)
-    # return send_from_directory("images", filename, as_attachment=True)
-    # return render_template("gallery.html", image_name=filename)
-    # return redirect(url_for('get_gallery'))
+    
+    # returredirect(url_for('get_gallery'))
 
+@app.route("/pdfconverter")
+def imgtopdf():
+    return render_template("pdfconvert.html")
+
+@app.route("/pdfconverter", methods=["POST"])
+def pdfconverter():
+    target = os.path.join(APP_ROOT, 'imagesForpdf/')
+
+    for filename in os.listdir(target):
+        file_path = os.path.join(target, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+    print(target)
+    if not os.path.isdir(target):
+            os.mkdir(target)
+    else:
+        print("Couldn't create upload directory: {}".format(target))
+    print(request.files.getlist("file"))
+    for upload in request.files.getlist("file"):
+        print(upload)
+        print("{} is the file name".format(upload.filename))
+        filename = upload.filename
+        destination = "/".join([target, filename])
+        print ("Accept incoming file:", filename)
+        print ("Save it to:", destination)
+        upload.save(destination)
+
+
+    pdf = FPDF()
+    # imagelist is the list with all image filenames
+    target=os.path.join(APP_ROOT, 'imagesForpdf')
+    imagelist = glob.glob(target+'/*.jpg')
+    print(os.listdir(target))
+    for img in imagelist:
+        print(img)
+        pdf.add_page()
+        pdf.image(img )
+    pdf.output("pdfmade/yourfile.pdf", "F")
+
+    
+    for filename in os.listdir(target):
+            file_path = os.path.join(target, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
+    file_name = "yourfile.pdf"
+    print(file_name)
+    return render_template("download.html", file_name=file_name)
 
 @app.route("/grp_uploader")
 def grp_upload():
@@ -148,7 +208,7 @@ def query_uploader():
     exec(file)
     # return send_from_directory("images", filename, as_attachment=True)
     # return render_template("gallery.html", image_name=filename)
-    return redirect(url_for('downloader'))
+    return redirect(url_for('get_gallery'))
 
 @app.route('/upload/<filename>')
 def send_image(filename):
@@ -171,4 +231,4 @@ def get_gallery():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run()
+    app.run(host='0.0.0.0', port=3000)
